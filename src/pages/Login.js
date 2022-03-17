@@ -68,7 +68,7 @@ const Login = () => {
 							aria-label="Enter you email address "
 							type="text"
 							className="border rounded text-sm w-full py-5 px-4 h-2 mb-2"
-							placeholder="Phone number, username, or email"
+							placeholder="Username"
 							value={emailAddress}
 							style={{ fontSize: 12 }}
 							onChange={(e) => {

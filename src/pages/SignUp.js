@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../images/logo.png';
 import appStore from '../images/appStore.png';
 import playStore from '../images/playStore.png';
 import * as ROUTES from '../constants/routes';
+import FirebaseContext from '../context/firebase';
+import { doesUsernameExist } from '../services/firebase';
+import * as Routes from '../constants/routes'
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
-	const [email, setEmail] = useState('');
+	const { fireBase, auth } = useContext(FirebaseContext);
 	const [name, setName] = useState('');
 	const [username, setUsername] = useState('');
+	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [error, setError] = useState(null);
 	const isInvalid =
 		email === '' || name === '' || username === '' || password === '';
-	//let navigator = useNavigate();
-
-	useEffect(() => {
-		document.title = 'Login • Instagram';
-	}, []);
+	let navigator = useNavigate();
 
 	const handleInput = (e) => {
 		let type = e.target.name;
@@ -31,7 +32,7 @@ const SignUp = () => {
 				setName(value);
 				break;
 			case 'username':
-				setUsername(value);
+				setUsername(value.toLowerCase());
 				break;
 			case 'password':
 				setPassword(value);
@@ -40,6 +41,52 @@ const SignUp = () => {
 				break;
 		}
 	};
+
+	const handleSignUp = async (e) => {
+		e.preventDefault();
+
+		let usernameExists = await doesUsernameExist(username)
+		console.log(usernameExists);
+
+		if (!usernameExists.length) {
+			try {
+				const createdUserResult = await auth.createUserWithEmailAndPassword(
+					auth.getAuth(),
+					email,
+					password
+				);
+				//get user and update with username
+				const user = await auth.updateProfile(createdUserResult, {
+					displayname: username,
+				});
+
+				//add to firebase with matching properties of seed
+				await fireBase.firestore().collection('users').add({
+					userId: createdUserResult.user.uid,
+					fullName: name,
+					emailAddress: email,
+					following: [],
+					followers: [],
+					dateCreated: Date.now(),
+				});
+
+				navigator(ROUTES.DASHBOARD);
+			} catch (error) {
+				setName('');
+				setError(error.message);
+			}
+		} else {
+			setUsername('');
+			setName('');
+			setEmail('');
+			setPassword('');
+			setError('That username is already taken, please try another.');
+		}
+	};
+
+	useEffect(() => {
+		document.title = 'Login • Instagram';
+	}, []);
 
 	return (
 		<div className="container flex flex-col mx-auto max-w-screen-md items-center justify-center h-screen-3/4">
@@ -59,14 +106,17 @@ const SignUp = () => {
 						OR
 					</span>
 				</div>
-				<form method="POST" className="">
+				{error ? (
+					<p className="mb-4 text-xs text-red-500 text-center">{error}</p>
+				) : null}
+				<form method="POST" className="" onSubmit={handleSignUp}>
 					<input
 						className="border rounded text-xxs w-full py-4 px-3 h-2 mb-2 bg-gray-50 font-semibold"
-						aria-label="Enter your mobile number or email"
-						name="email"
+						aria-label="Enter your username"
+						name="username"
 						type="text"
-						value={email}
-						placeholder="Mobile Number or Email"
+						value={username}
+						placeholder="Username"
 						onChange={(e) => handleInput(e)}
 					/>
 					<input
@@ -80,11 +130,11 @@ const SignUp = () => {
 					/>
 					<input
 						className="border rounded text-xxs w-full py-4 px-3 h-2 mb-2 bg-gray-50 font-semibold"
-						aria-label="Enter your username"
-						name="username"
+						aria-label="Email Address"
+						name="email"
 						type="text"
-						value={username}
-						placeholder="Username"
+						value={email}
+						placeholder="Mobile Number or Email"
 						onChange={(e) => handleInput(e)}
 					/>
 					<input
