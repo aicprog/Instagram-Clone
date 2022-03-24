@@ -14,7 +14,7 @@ import fb from '../images/fb.png';
 import FirebaseContext from '../context/firebase';
 
 const Login = () => {
-	const { fireBase } = useContext(FirebaseContext);
+	const { auth } = useContext(FirebaseContext);
 	const [emailAddress, setEmailAddress] = useState('');
 	const [password, setPassword] = useState('');
 	const [error, setError] = useState(null);
@@ -36,7 +36,11 @@ const Login = () => {
 		e.preventDefault();
 
 		try {
-			await fireBase.auth().signInWithEmailAndPassword(emailAddress, password);
+			await auth.signInWithEmailAndPassword(
+				auth.getAuth(),
+				emailAddress,
+				password
+			);
 			navigator(ROUTES.DASHBOARD);
 		} catch (error) {
 			setError(error.message);

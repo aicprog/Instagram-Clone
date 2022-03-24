@@ -9,8 +9,8 @@ const Footer = () => {
 	return (
 		<div className="flex flex-col justify-flex items-center text-gray-500 mt-10">
 			<div className="flex gap-x-6 gap-y-3 flex-wrap items-center justify-center">
-				{topLinks.map((link) => (
-					<a href="/">
+				{topLinks.map((link, index) => (
+					<a href="/" key={index}>
 						<p className="text-xs">{link}</p>
 					</a>
 				))}

@@ -1,7 +1,12 @@
 import { seedDatabase } from '../seed';
 // import  FieldValue  from 'firebase/firestore';
 import firebase from 'firebase/compat/app';
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import {
+	getAuth,
+	createUserWithEmailAndPassword,
+	updateProfile,
+	signInWithEmailAndPassword,
+} from 'firebase/auth';
 import 'firebase/compat/firestore';
 
 // Your web app's Firebase configuration
@@ -16,7 +21,12 @@ const firebaseConfig = {
 
 const fireBase = firebase.initializeApp(firebaseConfig);
 const FieldValue = firebase.firestore.FieldValue;
-const auth = { getAuth, createUserWithEmailAndPassword, updateProfile };
+const auth = {
+	getAuth,
+	createUserWithEmailAndPassword,
+	updateProfile,
+	signInWithEmailAndPassword,
+};
 
 //seed database
 //seedDatabase(fireBase);

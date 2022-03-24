@@ -6,7 +6,7 @@ import playStore from '../images/playStore.png';
 import * as ROUTES from '../constants/routes';
 import FirebaseContext from '../context/firebase';
 import { doesUsernameExist } from '../services/firebase';
-import * as Routes from '../constants/routes'
+import * as Routes from '../constants/routes';
 import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
@@ -45,8 +45,8 @@ const SignUp = () => {
 	const handleSignUp = async (e) => {
 		e.preventDefault();
 
-		let usernameExists = await doesUsernameExist(username)
-		console.log(usernameExists);
+		let usernameExists = await doesUsernameExist(username);
+		//console.log(usernameExists);
 
 		if (!usernameExists.length) {
 			try {
@@ -56,13 +56,14 @@ const SignUp = () => {
 					password
 				);
 				//get user and update with username
-				const user = await auth.updateProfile(createdUserResult, {
-					displayname: username,
+				const user = await auth.updateProfile(auth.getAuth().currentUser, {
+					displayName: username,
 				});
 
 				//add to firebase with matching properties of seed
 				await fireBase.firestore().collection('users').add({
 					userId: createdUserResult.user.uid,
+					username: username,
 					fullName: name,
 					emailAddress: email,
 					following: [],
